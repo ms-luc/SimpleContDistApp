@@ -1,0 +1,1 @@
+Dummy content server www.herCDN.com which delivers content to our client using HTTP. 

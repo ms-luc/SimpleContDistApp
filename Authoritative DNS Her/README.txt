@@ -1,0 +1,1 @@
+Dummy authoritative DNS server for domain herCDN.com which will return IP address for www.herCDN.com
