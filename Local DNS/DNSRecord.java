@@ -1,4 +1,4 @@
-package localdns;
+package client;
 
 import java.net.*;
 
