@@ -66,7 +66,7 @@ class Client {
 
 
     clientSocket.send(sendPacket);
-
+		/*
     DatagramPacket receivePacket =
       new DatagramPacket(receiveData, receiveData.length);
 
@@ -74,7 +74,7 @@ class Client {
 
     String returnedRecord = new String(receivePacket.getData());
 
-    System.out.println("FROM DNS:" + returnedRecord);
+    System.out.println("FROM DNS:" + returnedRecord);*/
     clientSocket.close();
 
 		return new DNSRecord("", new InetSocketAddress("localhost",0), "");

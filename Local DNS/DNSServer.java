@@ -12,11 +12,11 @@ import java.net.*;
 
 */
 
-public class UDP{
+public class DNSServer{
 
-  DNSRecord hisCinemma = new DNSRecord("www.hiscinema.com", new InetSocketAddress("localhost",6789), "");
-  DNSRecord herCDN = new DNSRecord("www.herCDN.com", new InetSocketAddress("localhost",6000), "");
-  public DNSRecord[] records = { hisCinema, herCDN };
+  DNSRecord hisCinema = new DNSRecord("www.hiscinema.com", new InetSocketAddress("localhost",6789), "");
+
+  public DNSRecord[] records = { hisCinema };
 
   public static void main(String argv[]) throws Exception{
 
@@ -34,6 +34,8 @@ public class UDP{
 
       String sentence = new String(receivePacket.getData());
 
+      System.out.print(sentence);
+      /*
       InetAddress IPAddress = receivePacket.getAddress();
 
       int port = receivePacket.getPort();
@@ -45,7 +47,7 @@ public class UDP{
       DatagramPacket sendPacket =
         new DatagramPacket(sendData, sendData.length, IPAddress, port);
 
-      serverSocket.send(sendPacket);
+      serverSocket.send(sendPacket);*/
 
 	   }
 
