@@ -9,23 +9,31 @@ class Server {
 
   ServerSocket servsock = new ServerSocket(6789);
 
-
+  System.out.println("initialized");
     while(true) {
 
       Socket sock = servsock.accept();
 
-      BufferedReader inFromServer =
-        new BufferedReader(new InputStreamReader(sock.getInputStream()));
+      System.out.println("Connected");
 
-      System.out.println("looking");
-      File file = new File(inFromServer.readLine());
-      System.out.println("not found");
+      //BufferedReader inFromClient =
+        //new BufferedReader(new InputStreamReader(sock.getInputStream()));
+
+      //System.out.println("looking");
+      //File file = new File(inFromServer.readLine());
+      //System.out.println("not found");
+
+      File file = new File("index.html");
 
       if(file.exists()){
 
+        System.out.println("Sending");
+
         DataOutputStream outToClient = new DataOutputStream(sock.getOutputStream());
 
-        outToClient.writeBytes("ACK\n");
+        outToClient.writeBytes("index.html\n");
+
+        System.out.println("sent file name");
 
         byte[] mybytearray = new byte[(int) file.length()];
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
@@ -35,7 +43,7 @@ class Server {
         os.flush();
         sock.close();
 
-        System.out.println(mybytearray);
+        System.out.println("Sent");
       }
       else{
         //ERROR 404
