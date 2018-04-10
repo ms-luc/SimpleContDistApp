@@ -9,21 +9,25 @@ class Client {
 	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("localhost",6565), "");
 	DNSRecord[] cache = new DNSRecord[]{hisCinemma};
 
+	static String message = "CLIENT: "; //client message
+
 	public static void main(String argv[]) throws Exception {
 
 		Client client = new Client();
-		System.out.println("connecting");
+
 		client.connect("abc/Video");
-		System.out.println("fin");
+		System.out.println(message+ "terminating");
 
 	}
 
 	public void connect(String url) throws Exception{
 
+		System.out.println(message+ "connecting to " + url);
+
 		boolean cached = false;
 		for(int i = 0; i < cache.length; i ++){
 			if(cache[i].name.equals(url)){
-				System.out.println("found, requesting");
+				System.out.println(message+ "found url: " + url + " in cahce, requesting");
 				cached = true;
 
 				//IGNORE THE INDEX.HTML
@@ -31,18 +35,19 @@ class Client {
 			}
 		}
 
+		// IF NOT ACCESS THE LOCAL DNS
 		if(cached == false){
 
-			System.out.println("working on it");
+			System.out.println(message+ " url " + url + " not cached, asking DNS");
 			DNSRecord temp = askDNS(url, localDNS.value.getHostString(), localDNS.value.getPort());
-			System.out.println("fin");
+			//System.out.println("fin");
 
 
 			//getRequest("index.html", localDNS.value.getHostString(), localDNS.value.getPort());
 
 		}
 
-		// IF NOT ACCESS THE LOCAL DNS
+
 
 	}
 
@@ -83,6 +88,8 @@ class Client {
 
 	public static void getRequest(String fileName, String serverName, int serverPort) throws Exception{
 
+		System.out.println(message+ "fetching file");
+
 		Socket sock = new Socket(serverName, serverPort);
 
 		//DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
@@ -95,9 +102,9 @@ class Client {
 
 		String responce = inFromServer.readLine();
 
-		System.out.println("getting file: " + responce);
+		System.out.println(message+"getting file: " + responce);
 
-		if(responce.equals("404 NOT FOUND")){
+		if(responce.equals(message+"404 NOT FOUND")){
 
 			System.out.println(responce);
 			sock.close();

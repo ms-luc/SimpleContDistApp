@@ -1,4 +1,4 @@
-package localdns;
+package hisdns;
 import java.io.*;
 import java.net.*;
 
@@ -12,13 +12,13 @@ import java.net.*;
 
 */
 
-public class DNSServer{
+public class HisDNS{
 
   static DNSRecord hisCinema = new DNSRecord("dns.hiscinema.com", new InetSocketAddress("localhost",6789), "");
 
   static DNSRecord[] cache = { hisCinema };
 
-  static String message = "LOCAL DNS: "; //dns server message
+  static String message = "HIS DNS: "; //dns server message
 
   public static void main(String argv[]) throws Exception{
 

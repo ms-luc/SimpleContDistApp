@@ -4,17 +4,19 @@ import java.net.*;
 
 class Server {
 
+  static String message = "WEB SERVER: "; //his web server message
 
   public static void main(String argv[]) throws Exception{
 
   ServerSocket servsock = new ServerSocket(6789);
 
-  System.out.println("initialized");
+  System.out.println("\n");
+  System.out.println(message+ "initialized");
     while(true) {
 
       Socket sock = servsock.accept();
 
-      System.out.println("Connected");
+      System.out.println(message+"Connected");
 
       //BufferedReader inFromClient =
         //new BufferedReader(new InputStreamReader(sock.getInputStream()));
@@ -27,13 +29,13 @@ class Server {
 
       if(file.exists()){
 
-        System.out.println("Sending");
+        System.out.println(message+"Sending index.html ");
 
         DataOutputStream outToClient = new DataOutputStream(sock.getOutputStream());
 
         outToClient.writeBytes("index.html\n");
 
-        System.out.println("sent file name");
+        System.out.println(message+"sent file name");
 
         byte[] mybytearray = new byte[(int) file.length()];
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
@@ -43,14 +45,14 @@ class Server {
         os.flush();
         sock.close();
 
-        System.out.println("Sent");
+        System.out.println(message+"Sent");
       }
       else{
         //ERROR 404
         DataOutputStream outToClient = new DataOutputStream(sock.getOutputStream());
         outToClient.writeBytes("404 NOT FOUND\n");
 
-        System.out.println("404 NOT FOUND");
+        System.out.println(message+"404 NOT FOUND");
       }
 
     }
