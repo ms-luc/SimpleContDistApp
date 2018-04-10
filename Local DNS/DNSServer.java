@@ -15,8 +15,9 @@ import java.net.*;
 public class DNSServer{
 
   static DNSRecord hisCinema = new DNSRecord("dns.hiscinema.com", new InetSocketAddress("localhost",6789), "");
+  static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",6000), "");
 
-  static DNSRecord[] cache = { hisCinema };
+  static DNSRecord[] cache = { hisCinema,  herVideo};
 
   static String message = "LOCAL DNS: "; //dns server message
 
@@ -47,6 +48,8 @@ public class DNSServer{
   		for(int i = 0; i < cache.length; i ++){
   			if(cache[i].name.equals(requestedURL)){
   				cached = true; //FOUND IN CACHE
+
+          System.out.print(message+ "Found url:" + requestedURL + " in cache");
 
           InetAddress IPAddress = receivePacket.getAddress();
 
