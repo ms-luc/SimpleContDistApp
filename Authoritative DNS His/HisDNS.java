@@ -4,9 +4,11 @@ import java.net.*;
 
 /*
 
-  Local DNS
+  His  DNS
 
   Recieve Request. (UDP)
+
+  Look in cache, if not found
   Process and forward to the requested site's DNS
   All IP's are known and stored
 
@@ -14,15 +16,16 @@ import java.net.*;
 
 public class HisDNS{
 
-  static DNSRecord hisCinema = new DNSRecord("dns.hiscinema.com", new InetSocketAddress("localhost",6789), "");
+  static DNSRecord someLocalDNS = new DNSRecord("dns.local", new InetSocketAddress("localhost",6565), "");
+  static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",6000), "");
 
-  static DNSRecord[] cache = { hisCinema };
+  static DNSRecord[] cache = { someLocalDNS,  herVideo};
 
   static String message = "HIS DNS: "; //dns server message
 
   public static void main(String argv[]) throws Exception{
 
-    DatagramSocket serverSocket = new DatagramSocket(6565);
+    DatagramSocket serverSocket = new DatagramSocket(6001);
 
 	  byte[] receiveData = new byte[512];
     byte[] sendData = new byte[512];
@@ -48,12 +51,14 @@ public class HisDNS{
   			if(cache[i].name.equals(requestedURL)){
   				cached = true; //FOUND IN CACHE
 
+          System.out.print(message+ "Found url:" + requestedURL + " in cache " + "\n");
+
           InetAddress IPAddress = receivePacket.getAddress();
 
           int port = receivePacket.getPort();
 
           sendData = new byte[512];
-          sendData = requestedURL.getBytes();
+          sendData = "dnsRecord(www.herCDN, IP, tag)".getBytes();
 
           DatagramPacket sendPacket =
             new DatagramPacket(sendData, sendData.length, IPAddress, port);
@@ -65,14 +70,15 @@ public class HisDNS{
 
       //IF NOT CACHED
       //REQUEST URL FROM ANOTHER DNS (first dns in list?)
+      cached = true;
   		if(cached == false){
 
-        InetAddress IPAddress = hisCinema.value.getAddress();
+        InetAddress IPAddress = someLocalDNS.value.getAddress();
 
-        int port = hisCinema.value.getPort();
+        int port = someLocalDNS.value.getPort();
 
         sendData = new byte[512];
-        sendData = requestedURL.getBytes();
+        sendData = "dnsRecord(www.herCDN, IP, tag)".getBytes();
 
         DatagramPacket sendPacket =
           new DatagramPacket(sendData, sendData.length, IPAddress, port);
