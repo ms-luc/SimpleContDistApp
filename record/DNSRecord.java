@@ -16,6 +16,20 @@ public class DNSRecord{
 
   }
 
+  public DNSRecord convertToRecord(ObjectOutPutStream recievedData){
+
+    //some operation to convert a ObjectOutPutStream object to DNSrecord Object
+
+    return DNSRecord
+  }
+
+  public ObjectOutPutStream convertToObjectOutputStream(DNSRecord toBeSent){
+
+    //some operation to convert a DNSRecord Object to an ObjectOutPutStream Object
+
+    return ObjectOutPutStream
+  }
+
   public String toString(){
     //return "DNS Record, name: " + name + " IP: " + value.getHostString + " Port: " + value.getPort + " type: " + type;
     return "DNS Record, name: " + name + " IP: " + value + " type: " + type;
