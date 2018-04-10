@@ -2,16 +2,13 @@
 echo.
 ::everything is executed in background
 
-:: compile and run local dns server
-start /b /d .\"Local DNS"\ cmd /c javac -d . *.java
+:: compile and dns
+:: run DNS servers
+start /b /d .\"DNS"\ cmd /c javac -d . *.java
 timeout 2 >nul
-start /b /d .\"Local DNS"\ cmd /c java localdns.DNSServer
+start /b /d .\"DNS"\ cmd /c java dns.LocalDNS
 echo "Local DNS launched"
-
-:: compile and run local dns server
-start /b /d .\"Authoritative DNS His"\ cmd /c javac -d . *.java
-timeout 2 >nul
-start /b /d .\"Authoritative DNS His"\ cmd /c java hisdns.HisDNS
+start /b /d .\"DNS"\ cmd /c java dns.HisDNS
 echo "His DNS launched"
 
 :: compile and run his web server

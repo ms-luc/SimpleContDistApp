@@ -1,4 +1,4 @@
-package hisdns;
+package dns;
 
 import java.net.*;
 

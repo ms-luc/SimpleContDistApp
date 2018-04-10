@@ -1,10 +1,10 @@
-package localdns;
+package dns;
 import java.io.*;
 import java.net.*;
 
 /*
 
-  Local DNS
+  DNS Server
 
   Recieve Request. (UDP)
   Process and forward to the requested site's DNS
@@ -12,25 +12,43 @@ import java.net.*;
 
 */
 
-public class DNSServer{
+public class DNS{
 
-  static DNSRecord hisCinemaDNS = new DNSRecord("dns.hiscinema.com", new InetSocketAddress("localhost",6001), "");
-  //static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",6000), "");
-  //static DNSRecord[] cache = { hisCinema,  herVideo};
+  // an Array for storing cached DNS records
+  public static DNSRecord[] cache;
 
-  static DNSRecord[] cache = { hisCinemaDNS};
+  // message for debugging
+  public static String message; //Object message
 
-  static String message = "LOCAL DNS: "; //dns server message
+  // server port variable
+  public static int serverPort;
 
-  public static void main(String argv[]) throws Exception{
+  DNS(){
 
-    DatagramSocket serverSocket = new DatagramSocket(6565);
 
-    // current recieved packet
+  }
+
+  DNS(DNSRecord[] array, String m, int port){
+
+    // initialize all variables
+    cache = array;
+    message = m;
+    serverPort = port;
+
+  }
+
+
+  public void launchServer() throws Exception{
+
+    // a UDP server socket
+    DatagramSocket serverSocket = new DatagramSocket(serverPort);
+
+    // current recieved packet UDP
 	  DatagramPacket receivePacket;
 
     // Currect client's IP
     InetAddress client_ipAddress;
+
     // Currect client's PORT
     int client_port;
 
@@ -64,7 +82,8 @@ public class DNSServer{
           // get Client's IP
           // get Client's Port
           // send back a DNS record
-          sendUDPPacket(serverSocket, requestedURL, client_ipAddress, client_port);
+          String dnsRecord = "dnsRecord(www.herCDN, IP, tag)";
+          sendUDPPacket(serverSocket, dnsRecord, client_ipAddress, client_port);
           System.out.print(message+ "Found url:" + requestedURL + " in cache " + "\n");
 
   			}
@@ -76,7 +95,7 @@ public class DNSServer{
   		if(cached == false){
 
         // send to another DNS a record Request
-        sendUDPPacket(serverSocket, requestedURL, hisCinemaDNS.value.getAddress(), hisCinemaDNS.value.getPort() );
+        sendUDPPacket(serverSocket, requestedURL, cache[0].value.getAddress(), cache[0].value.getPort() );
 
         // recieve a Responce from the DNS
         receivePacket = recieveUDPPacket(serverSocket);
@@ -92,6 +111,7 @@ public class DNSServer{
 	   }
 
   }
+
 
   // sends a UDP packet
   // max data size: 512 bytes

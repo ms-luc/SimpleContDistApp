@@ -16,4 +16,4 @@ if "%1" == "" (
 ::if [%var%] == [/?] (  java localdns.%1 )
 
 javac -d . *.java
-java localdns.%1
+java dns.%1

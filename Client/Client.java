@@ -6,7 +6,7 @@ import java.net.*;
 class Client {
 
 	DNSRecord hisCinemma = new DNSRecord("www.hiscinema.com", new InetSocketAddress("localhost",6789), "");
-	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("localhost",6565), "");
+	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("localhost", 6000), "");
 	DNSRecord[] cache = new DNSRecord[]{hisCinemma};
 
 	static String message = "CLIENT: "; //client message

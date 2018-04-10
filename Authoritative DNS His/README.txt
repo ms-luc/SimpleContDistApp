@@ -1,1 +1,0 @@
-Dummy authoritative DNS server for domain hiscinema.com which will return URL for herCDN.com
