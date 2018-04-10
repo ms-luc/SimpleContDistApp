@@ -49,7 +49,7 @@ public class DNSServer{
   			if(cache[i].name.equals(requestedURL)){
   				cached = true; //FOUND IN CACHE
 
-          System.out.print(message+ "Found url:" + requestedURL + " in cache");
+          System.out.print(message+ "Found url:" + requestedURL + " in cache " + "\n");
 
           InetAddress IPAddress = receivePacket.getAddress();
 
