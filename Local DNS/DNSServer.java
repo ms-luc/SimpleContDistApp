@@ -14,40 +14,70 @@ import java.net.*;
 
 public class DNSServer{
 
-  DNSRecord hisCinema = new DNSRecord("www.hiscinema.com", new InetSocketAddress("localhost",6789), "");
+  static DNSRecord hisCinema = new DNSRecord("dns.hiscinema.com", new InetSocketAddress("localhost",6789), "");
 
-  public DNSRecord[] records = { hisCinema };
+  static DNSRecord[] cache = { hisCinema };
 
   public static void main(String argv[]) throws Exception{
 
-    DatagramSocket serverSocket = new DatagramSocket(9876);
+    DatagramSocket serverSocket = new DatagramSocket(6565);
 
-	  byte[] receiveData = new byte[1024];
-    byte[] sendData = new byte[1024];
+	  byte[] receiveData = new byte[512];
+    byte[] sendData = new byte[512];
 
     while(true) {
 
+      //RECIEVE PACKET
       DatagramPacket receivePacket =
         new DatagramPacket(receiveData, receiveData.length);
 
       serverSocket.receive(receivePacket);
 
-      String sentence = new String(receivePacket.getData());
+      String requestedURL = new String(receivePacket.getData());
+      requestedURL = requestedURL.replaceAll("\0", ""); //RETRIEVE URL
 
-      System.out.print(sentence);
-      /*
-      InetAddress IPAddress = receivePacket.getAddress();
+      System.out.print(requestedURL + " - Requested URL\n");
 
-      int port = receivePacket.getPort();
+      //RECIEVE PACKET END
 
-	    String capitalizedSentence = sentence.toUpperCase();
+      // FIND URL IN CACHE
+      boolean cached = false;
+  		for(int i = 0; i < cache.length; i ++){
+  			if(cache[i].name.equals(requestedURL)){
+  				cached = true; //FOUND IN CACHE
 
-      sendData = capitalizedSentence.getBytes();
+          InetAddress IPAddress = receivePacket.getAddress();
 
-      DatagramPacket sendPacket =
-        new DatagramPacket(sendData, sendData.length, IPAddress, port);
+          int port = receivePacket.getPort();
 
-      serverSocket.send(sendPacket);*/
+          sendData = new byte[512];
+          sendData = requestedURL.getBytes();
+
+          DatagramPacket sendPacket =
+            new DatagramPacket(sendData, sendData.length, IPAddress, port);
+
+          serverSocket.send(sendPacket);
+
+  			}
+  		}// FIND URL IN CACHE END
+
+      //IF NOT CACHED
+      //REQUEST URL FROM ANOTHER DNS (first dns in list?)
+  		if(cached == false){
+
+        InetAddress IPAddress = hisCinema.value.getAddress();
+
+        int port = hisCinema.value.getPort();
+
+        sendData = new byte[512];
+        sendData = requestedURL.getBytes();
+
+        DatagramPacket sendPacket =
+          new DatagramPacket(sendData, sendData.length, IPAddress, port);
+
+        serverSocket.send(sendPacket);
+
+  		}//REQUEST ANOTHER DNS FOR URL END
 
 	   }
 

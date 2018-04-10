@@ -16,7 +16,6 @@ class Client {
 		client.connect("abc/Video");
 		System.out.println("fin");
 
-		client.connect("www.hiscinema.com/Video");
 	}
 
 	public void connect(String url) throws Exception{
@@ -32,10 +31,11 @@ class Client {
 			}
 		}
 
-		if(!cached){
+		if(cached == false){
 
+			System.out.println("working on it");
 			DNSRecord temp = askDNS(url, localDNS.value.getHostString(), localDNS.value.getPort());
-
+			System.out.println("fin");
 
 
 			//getRequest("index.html", localDNS.value.getHostString(), localDNS.value.getPort());
