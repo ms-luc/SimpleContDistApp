@@ -19,6 +19,8 @@ public class DNSRecord{
   public DNSRecord convertToRecord(ObjectOutPutStream recievedData){
 
     //some operation to convert a ObjectOutPutStream object to DNSrecord Object
+    // basically retrieve the ObjectOutPutStream as a string
+    // then set the values for name, value, type
 
     return DNSRecord
   }
