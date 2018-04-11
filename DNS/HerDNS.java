@@ -16,7 +16,7 @@ public class HerDNS extends DNS{
 
   //static DNS localDNS;
 
-  static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",6003), "V");
+  static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",6102), "V");
   //static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",6000), "");
   //static DNSRecord[] cache = { hisCinema,  herVideo};
 

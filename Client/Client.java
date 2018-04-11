@@ -46,7 +46,7 @@ class Client {
 			//System.out.println("fin");
 
 
-			//getRequest("index.html", localDNS.value.getHostString(), localDNS.value.getPort());
+			getRequest("video.mp4", temp.value.getHostString(), temp.value.getPort());
 
 		}
 
@@ -101,7 +101,6 @@ class Client {
 
 		//outToServer.writeBytes(fileName + "\n");
 
-		System.out.println("initialized");
 		BufferedReader inFromServer =
 			new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
@@ -124,6 +123,8 @@ class Client {
 	    bos.write(mybytearray, 0, bytesRead);
 	    bos.close();
 	    sock.close();
+
+			System.out.println(message+"recieved: " + responce);
 		}
 
 	}
