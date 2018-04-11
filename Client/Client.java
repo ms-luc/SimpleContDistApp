@@ -16,10 +16,10 @@ class Client {
 		Client client = new Client();
 
 		client.connect("www.hiscinema.com");
-		System.out.println(message+ "terminating" + "www.hiscinema.com");
+		System.out.println(message+ "terminating" + " www.hiscinema.com");
 
 		client.connect("abc/Video");
-		System.out.println(message+ "terminating" + "abc/Video");
+		System.out.println(message+ "terminating" + " abc/Video");
 
 	}
 
@@ -30,7 +30,7 @@ class Client {
 		boolean cached = false;
 		for(int i = 0; i < cache.length; i ++){
 			if(cache[i].name.equals(url)){
-				System.out.println(message+ "found url: " + url + " in cahce, requesting");
+				System.out.println(message+ "found url: " + url + " in cache, requesting");
 				cached = true;
 
 				//IGNORE THE INDEX.HTML
