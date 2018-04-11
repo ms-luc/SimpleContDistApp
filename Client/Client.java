@@ -5,7 +5,7 @@ import java.net.*;
 
 class Client {
 
-	DNSRecord hisCinemma = new DNSRecord("www.hiscinema.com", new InetSocketAddress("localhost",6789), " ");
+	DNSRecord hisCinemma = new DNSRecord("www.hiscinema.com", new InetSocketAddress("localhost",6101), " ");
 	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("localhost", 6000), " ");
 	DNSRecord[] cache = new DNSRecord[]{hisCinemma};
 
@@ -15,8 +15,11 @@ class Client {
 
 		Client client = new Client();
 
+		client.connect("www.hiscinema.com");
+		System.out.println(message+ "terminating" + "www.hiscinema.com");
+
 		client.connect("abc/Video");
-		System.out.println(message+ "terminating");
+		System.out.println(message+ "terminating" + "abc/Video");
 
 	}
 
@@ -39,7 +42,7 @@ class Client {
 		if(cached == false){
 
 			System.out.println(message+ " url " + url + " not cached, asking DNS");
-			DNSRecord temp = askDNS(url, localDNS.value.getHostString(), localDNS.value.getPort());
+			DNSRecord temp = askDNS("A", url, localDNS.value.getHostString(), localDNS.value.getPort());
 			//askDNS(url, localDNS.value.getHostString(), localDNS.value.getPort());
 
 			System.out.println(message+ "Fetched record: " + temp);
@@ -55,7 +58,7 @@ class Client {
 	}
 
 	//ASKS LOCAL DNS FOR DNS RECORD
-	public static DNSRecord askDNS(String url, String ip, int port) throws Exception{
+	public static DNSRecord askDNS(String type, String url, String ip, int port) throws Exception{
 
 	  DatagramSocket clientSocket = new DatagramSocket();
 
@@ -64,7 +67,7 @@ class Client {
 	  byte[] sendData = new byte[1024];
     byte[] receiveData = new byte[1024];
 
-    String sentence = url;
+    String sentence = type + "," + url;
 
     sendData = sentence.getBytes();
 

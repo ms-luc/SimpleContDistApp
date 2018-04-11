@@ -68,34 +68,64 @@ public class DNS{
       client_ipAddress = receivePacket.getAddress();
       client_port = receivePacket.getPort();
 
-      // convert URL to string
-      String requestedURL = packetToString(receivePacket);
+      // convert request to string
+      String[] request = packetToString(receivePacket).split(",");
+
+      // retrieve requested URL from request
+      String requestedURL = request[1];
+
+      // retrieve requested Type from request
+      String requestedType = request[0];
+      if(requestedType.equals(""))
+        requestedType = "A";
 
       // print url requested by client
-      System.out.print(message+ " got request for: " + requestedURL + "\n");
+      System.out.print(message+ " got request for: " + requestedURL + " type: " + request[0] + "\n");
 
       //RECIEVE PACKET END
 
+      // used in deciding if a Record is A or NS
+      String tempRecord = "";
+
       // FIND URL IN cacheServers
-      boolean cached = false;
+      String cached = "false";
   		for(int i = 0; i < cacheServers.length; i ++){
   			if(cacheServers[i].name.equals(requestedURL)){
+          // acks that the URL is cached
+          cached = cacheServers[i].type;
 
-  				cached = true; //FOUND IN cacheServers
+          System.out.print(message+ "Found url:" + requestedURL + " type " + cacheServers[i].type + "\n");
 
-          // get Client's IP
-          // get Client's Port
-          // send back a DNS record
-          String dnsRecord = cacheServers[i].toString();
-          sendUDPPacket(serverSocket, dnsRecord, client_ipAddress, client_port);
-          System.out.print(message+ "Found url:" + requestedURL + " in cacheServers " + "\n");
+          if(cacheServers[i].type.equals(requestedType)){
+              // set DNS record to A even if a record with NS exists
+  				    tempRecord = cacheServers[i].toString();
+          }
+
+          if(!cacheServers[i].type.equals(requestedType) && !cached.equals(requestedType)){
+              // set DNS record to NS one
+              tempRecord = cacheServers[i].toString();
+          }
+
+          if(cached.equals(requestedType)){
+            break;
+          }
+
 
   			}
   		}// FIND URL IN cacheServers END
 
+      if(!cached.equals("false")){
+        // get Client's IP
+        // get Client's Port
+        // send back a DNS record
+        String dnsRecord = tempRecord;
+        sendUDPPacket(serverSocket, dnsRecord, client_ipAddress, client_port);
+        System.out.print(message+ "Found url:" + requestedURL + " in cacheServers " + "\n");
+      }
+
       //IF NOT CACHED
       //REQUEST URL FROM ANOTHER DNS (first dns in list?)
-  		if(cached == false){
+  		if(cached.equals("false")){
 
         System.out.print(message+ requestedURL + " not found in cache\n");
 
@@ -104,13 +134,16 @@ public class DNS{
           System.out.print(message+ "asking " + cacheDNS[i] + " for a record\n");
 
           // send to other DNS a record Request
-          sendUDPPacket(serverSocket, requestedURL, cacheDNS[i].value.getAddress(), cacheDNS[i].value.getPort() );
+          sendUDPPacket(serverSocket, requestedType + "," + requestedURL, cacheDNS[i].value.getAddress(), cacheDNS[i].value.getPort() );
 
           // recieve a Responce from the DNS
           receivePacket = recieveUDPPacket(serverSocket);
 
+          // initialize temp record
+          DNSRecord tempRecord2 = new DNSRecord().toRecord(packetToString(receivePacket));
+
           // checks if type = V
-          if( (new DNSRecord().toRecord(packetToString(receivePacket))).type.equals("V") ){
+          if( (tempRecord2).name.equals(requestedURL) && (tempRecord2).type.equals(requestedType) ){
 
             // send client the DNS record
 
@@ -118,7 +151,31 @@ public class DNS{
             sendUDPPacket(serverSocket, packetToString(receivePacket), client_ipAddress, client_port);
 
             // print recieved data
-            System.out.print(message+ "Got dnsRecord from " + cacheDNS[i].name + ": " + packetToString(receivePacket) + "\n");
+            System.out.print(message+ "Got correct DNS record from " + cacheDNS[i].name + ": " + packetToString(receivePacket) + "\n");
+            System.out.print(message+ "Seinding to Client\n");
+
+            // no need to loop more
+            break;
+          }
+          // else if the URL got a matching from DNS but not the Type, ask the DNS which holds the wrong type Record
+          else if( (tempRecord2).name.equals(requestedURL) && !(tempRecord2).type.equals(requestedType) ){
+
+            System.out.print(message+ "Got NS type from " + cacheDNS[i].name + ": " + packetToString(receivePacket) + "\n");
+
+            // ask NS DNS for an A type record
+            sendUDPPacket(serverSocket, requestedType + "," + requestedURL, tempRecord2.value.getAddress() , tempRecord2.value.getPort());
+            System.out.print(message+ " asking " + tempRecord2.name + ": " + requestedType + "," + requestedURL + "\n");
+            System.out.print(message+ " asking " + tempRecord2.value.getAddress() + tempRecord2.value.getPort() + "\n");
+
+
+            receivePacket = recieveUDPPacket(serverSocket);
+
+            System.out.print(message+ " got " + packetToString(receivePacket) + "\n");
+            // return record to Client, but keep DNS record as a String
+            sendUDPPacket(serverSocket, packetToString(receivePacket), client_ipAddress, client_port);
+
+            // print recieved data
+
             System.out.print(message+ "Seinding to Client\n");
 
             // no need to loop more
