@@ -12,11 +12,11 @@ import java.net.*;
 
 */
 
-public class HisDNS extends DNS{
+public class HerDNS extends DNS{
 
   //static DNS localDNS;
 
-  static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",6003), "NS");
+  static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",6003), "V");
   //static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",6000), "");
   //static DNSRecord[] cache = { hisCinema,  herVideo};
 
@@ -25,7 +25,7 @@ public class HisDNS extends DNS{
 
   public static void main(String argv[]) throws Exception{
 
-    DNS hisDNS = new DNS(cacheDNS, cacheServers, "His DNS: ", 6001);
+    DNS hisDNS = new DNS(cacheDNS, cacheServers, "Her DNS: ", 6002);
 
     hisDNS.launchServer();
 

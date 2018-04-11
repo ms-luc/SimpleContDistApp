@@ -5,8 +5,8 @@ import java.net.*;
 
 class Client {
 
-	DNSRecord hisCinemma = new DNSRecord("www.hiscinema.com", new InetSocketAddress("localhost",6789), "");
-	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("localhost", 6000), "");
+	DNSRecord hisCinemma = new DNSRecord("www.hiscinema.com", new InetSocketAddress("localhost",6789), " ");
+	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("localhost", 6000), " ");
 	DNSRecord[] cache = new DNSRecord[]{hisCinemma};
 
 	static String message = "CLIENT: "; //client message
@@ -22,7 +22,7 @@ class Client {
 
 	public void connect(String url) throws Exception{
 
-		System.out.println(message+ "connecting to " + url);
+		System.out.println("\n"+message+ "connecting to " + url);
 
 		boolean cached = false;
 		for(int i = 0; i < cache.length; i ++){
@@ -40,6 +40,9 @@ class Client {
 
 			System.out.println(message+ " url " + url + " not cached, asking DNS");
 			DNSRecord temp = askDNS(url, localDNS.value.getHostString(), localDNS.value.getPort());
+			//askDNS(url, localDNS.value.getHostString(), localDNS.value.getPort());
+
+			System.out.println(message+ "Fetched record: " + temp);
 			//System.out.println("fin");
 
 
@@ -79,10 +82,12 @@ class Client {
 
     String returnedRecord = new String(receivePacket.getData());
 
-    System.out.println(message+"FROM DNS:" + returnedRecord);
+		returnedRecord = returnedRecord.replaceAll("\0", "");
+
+    System.out.println(message+"from local DNS:" + returnedRecord);
     clientSocket.close();
 
-		return new DNSRecord("", new InetSocketAddress("localhost",0), "");
+		return new DNSRecord().toRecord(returnedRecord);
 
 	}
 

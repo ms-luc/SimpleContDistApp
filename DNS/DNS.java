@@ -15,7 +15,10 @@ import java.net.*;
 public class DNS{
 
   // an Array for storing cached DNS records
-  public static DNSRecord[] cache;
+  // these Records contain only DNS servers
+  public static DNSRecord[] cacheDNS;
+
+  public static DNSRecord[] cacheServers;
 
   // message for debugging
   public static String message; //Object message
@@ -28,10 +31,11 @@ public class DNS{
 
   }
 
-  DNS(DNSRecord[] array, String m, int port){
+  DNS(DNSRecord[] dns, DNSRecord[] servers, String m, int port){
 
     // initialize all variables
-    cache = array;
+    cacheDNS = dns;
+    cacheServers = servers;
     message = m;
     serverPort = port;
 
@@ -68,43 +72,61 @@ public class DNS{
       String requestedURL = packetToString(receivePacket);
 
       // print url requested by client
-      System.out.print(message+ requestedURL + " - Requested URL\n");
+      System.out.print(message+ " got request for: " + requestedURL + "\n");
 
       //RECIEVE PACKET END
 
-      // FIND URL IN CACHE
+      // FIND URL IN cacheServers
       boolean cached = false;
-  		for(int i = 0; i < cache.length; i ++){
-  			if(cache[i].name.equals(requestedURL)){
+  		for(int i = 0; i < cacheServers.length; i ++){
+  			if(cacheServers[i].name.equals(requestedURL)){
 
-  				cached = true; //FOUND IN CACHE
+  				cached = true; //FOUND IN cacheServers
 
           // get Client's IP
           // get Client's Port
           // send back a DNS record
-          String dnsRecord = "dnsRecord(www.herCDN, IP, tag)";
+          String dnsRecord = cacheServers[i].toString();
           sendUDPPacket(serverSocket, dnsRecord, client_ipAddress, client_port);
-          System.out.print(message+ "Found url:" + requestedURL + " in cache " + "\n");
+          System.out.print(message+ "Found url:" + requestedURL + " in cacheServers " + "\n");
 
   			}
-  		}// FIND URL IN CACHE END
+  		}// FIND URL IN cacheServers END
 
       //IF NOT CACHED
       //REQUEST URL FROM ANOTHER DNS (first dns in list?)
-      System.out.print(message+ "Requesting His DNS for Record");
   		if(cached == false){
 
-        // send to another DNS a record Request
-        sendUDPPacket(serverSocket, requestedURL, cache[0].value.getAddress(), cache[0].value.getPort() );
+        System.out.print(message+ requestedURL + " not found in cache\n");
 
-        // recieve a Responce from the DNS
-        receivePacket = recieveUDPPacket(serverSocket);
-        String dnsRecord = packetToString(receivePacket);
-        // print recieved data
-        System.out.print(message+ "Got dnsRecord from His DNS: " + dnsRecord + "\n");
+        for(int i = 0; i < cacheDNS.length; i ++){
 
-        // return record to Client
-        sendUDPPacket(serverSocket, dnsRecord, client_ipAddress, client_port);
+          System.out.print(message+ "asking " + cacheDNS[i] + " for a record\n");
+
+          // send to other DNS a record Request
+          sendUDPPacket(serverSocket, requestedURL, cacheDNS[i].value.getAddress(), cacheDNS[i].value.getPort() );
+
+          // recieve a Responce from the DNS
+          receivePacket = recieveUDPPacket(serverSocket);
+
+          // checks if type = V
+          if( (new DNSRecord().toRecord(packetToString(receivePacket))).type.equals("V") ){
+
+            // send client the DNS record
+
+            // return record to Client, but keep DNS record as a String
+            sendUDPPacket(serverSocket, packetToString(receivePacket), client_ipAddress, client_port);
+
+            // print recieved data
+            System.out.print(message+ "Got dnsRecord from " + cacheDNS[i].name + ": " + packetToString(receivePacket) + "\n");
+            System.out.print(message+ "Seinding to Client\n");
+
+            // no need to loop more
+            break;
+          }
+          // indicate no matching
+          System.out.print(message+ "No matching from: " + cacheDNS[i] + "\n");
+        }
 
   		}//REQUEST ANOTHER DNS FOR URL END
 
@@ -115,11 +137,11 @@ public class DNS{
 
   // sends a UDP packet
   // max data size: 512 bytes
-  public static void sendUDPPacket(DatagramSocket serverSocket, String requestedURL, InetAddress ipAddress , int port)throws Exception{
+  public static void sendUDPPacket(DatagramSocket serverSocket, String data, InetAddress ipAddress , int port)throws Exception{
 
     // convert data into a byteStream
     byte[] sendData = new byte[512];
-    sendData = requestedURL.getBytes();
+    sendData = data.getBytes();
 
     // make packet
     DatagramPacket sendPacket =
