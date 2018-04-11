@@ -1,14 +1,14 @@
-package serverhis;
+package hercdn;
 import java.io.*;
 import java.net.*;
 
 class Server {
 
-  static String message = "WEB SERVER: "; //his web server message
+  static String message = "Her CDN SERVER: "; //his web server message
 
   public static void main(String argv[]) throws Exception{
 
-  ServerSocket servsock = new ServerSocket(6101);
+  ServerSocket servsock = new ServerSocket(6102);
 
   System.out.println("\n");
 
@@ -25,17 +25,17 @@ class Server {
       //File file = new File(inFromServer.readLine());
       //System.out.println("not found");
 
-      File file = new File("index.html");
+      File file = new File("video.mp4");
 
       if(file.exists()){
 
-        System.out.println(message+"Sending index.html ");
+        System.out.println(message+"Sending video.mp4 \n");
 
         DataOutputStream outToClient = new DataOutputStream(sock.getOutputStream());
 
-        outToClient.writeBytes("index.html\n");
+        outToClient.writeBytes("video.mp4\n");
 
-        System.out.println(message+"sent file name");
+        System.out.println(message+"sent file name\n");
 
         byte[] mybytearray = new byte[(int) file.length()];
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
@@ -45,14 +45,14 @@ class Server {
         os.flush();
         sock.close();
 
-        System.out.println(message+"Sent");
+        System.out.println(message+"Sent\n");
       }
       else{
         //ERROR 404
         DataOutputStream outToClient = new DataOutputStream(sock.getOutputStream());
         outToClient.writeBytes("404 NOT FOUND\n");
 
-        System.out.println(message+"404 NOT FOUND");
+        System.out.println(message+"404 NOT FOUND\n");
       }
 
     }
