@@ -7,3 +7,6 @@
 
 ::run the client, with output
 @start /b /d .\"Client"\ cmd /c java client.Client
+
+@timeout 2 > nul
+@echo -client executed
