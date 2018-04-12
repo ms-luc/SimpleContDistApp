@@ -2,14 +2,16 @@ package client;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
+import static java.nio.file.StandardOpenOption.*;
 
 class Client {
 
-	DNSRecord hisCinemma = new DNSRecord("www.hiscinema.com", new InetSocketAddress("localhost",6101), " ");
-	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("localhost", 6000), " ");
-	DNSRecord[] cache = new DNSRecord[]{hisCinemma};
-
 	static String message = "CLIENT: "; //client message
+		
+	DNSRecord hisCinemma = new DNSRecord("www.hiscinema.com", new InetSocketAddress("141.117.232.11",40200), "A");
+	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("141.117.232.13", 40200), "NS");
+	DNSRecord[] cache = new DNSRecord[]{hisCinemma};
 
 	public static void main(String argv[]) throws Exception {
 
@@ -127,7 +129,9 @@ class Client {
 		BufferedReader inFromServer =
 			new BufferedReader(new InputStreamReader(sock.getInputStream()));
 
-		String responce = inFromServer.readLine();
+		String[] fileSizeName = inFromServer.readLine().split("/");
+		int fileSize = Integer.valueOf(fileSizeName[0]);
+		String responce = fileSizeName[1];
 
 		System.out.println(message+"getting file: " + responce);
 
@@ -138,7 +142,7 @@ class Client {
 
 		}
 		else{
-	    byte[] mybytearray = new byte[1024];
+	    byte[] mybytearray = new byte[fileSize];
 	    InputStream is = sock.getInputStream();
 	    FileOutputStream fos = new FileOutputStream(responce);
 	    BufferedOutputStream bos = new BufferedOutputStream(fos);
