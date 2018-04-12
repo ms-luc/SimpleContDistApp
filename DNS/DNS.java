@@ -78,6 +78,9 @@ public class DNS{
       String requestedType = request[0];
       if(requestedType.equals(""))
         requestedType = "A";
+		
+	  if(requestedType.equals("V"))
+        requestedType = "A";
 
       // print url requested by client
       System.out.print(message+ " got request for: " + requestedURL + " type: " + request[0] + "\n");

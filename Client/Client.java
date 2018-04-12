@@ -42,7 +42,7 @@ class Client {
 		if(cached == false){
 
 			System.out.println(message+ " url " + url + " not cached, asking DNS");
-			DNSRecord temp = askDNS("A", url, localDNS.value.getHostString(), localDNS.value.getPort());
+			DNSRecord temp = askDNS(url, localDNS.value.getHostString(), localDNS.value.getPort());
 			//askDNS(url, localDNS.value.getHostString(), localDNS.value.getPort());
 
 			System.out.println(message+ "Fetched record: " + temp);
@@ -58,40 +58,60 @@ class Client {
 	}
 
 	//ASKS LOCAL DNS FOR DNS RECORD
-	public static DNSRecord askDNS(String type, String url, String ip, int port) throws Exception{
+	public static DNSRecord askDNS(String url, String ip, int port) throws Exception{
+		
+		// string to determine type
+		String type = determineType(url); 
+		
+	System.out.println(message+ " request from DNS: URL - " + url + " Record Type - " + type);
 
 	  DatagramSocket clientSocket = new DatagramSocket();
 
 	  InetAddress IPAddress = InetAddress.getByName(ip);
 
-	  byte[] sendData = new byte[1024];
-    byte[] receiveData = new byte[1024];
+		byte[] sendData = new byte[1024];
+		byte[] receiveData = new byte[1024];
 
-    String sentence = type + "," + url;
+		String sentence = type + "," + url;
 
-    sendData = sentence.getBytes();
+		sendData = sentence.getBytes();
 
-	  DatagramPacket sendPacket =
+		DatagramPacket sendPacket = 
 			new DatagramPacket(sendData, sendData.length, IPAddress, port);
-      //new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
+		  //new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
 
 
-    clientSocket.send(sendPacket);
+		clientSocket.send(sendPacket);
 
-    DatagramPacket receivePacket =
-      new DatagramPacket(receiveData, receiveData.length);
+		DatagramPacket receivePacket =
+		  new DatagramPacket(receiveData, receiveData.length);
 
-    clientSocket.receive(receivePacket);
+		clientSocket.receive(receivePacket);
 
-    String returnedRecord = new String(receivePacket.getData());
+		String returnedRecord = new String(receivePacket.getData());
 
 		returnedRecord = returnedRecord.replaceAll("\0", "");
 
-    System.out.println(message+"from local DNS:" + returnedRecord);
-    clientSocket.close();
+		System.out.println(message+"from local DNS:" + returnedRecord);
+		clientSocket.close();
 
 		return new DNSRecord().toRecord(returnedRecord);
 
+	}
+	
+	public static String determineType(String url){
+		
+		String type = "";
+		String[] splitUrl  = url.split("/");
+		
+		if ( splitUrl[splitUrl.length-1].equals("Video") ){
+			type = "V";
+		}
+		else{
+			type = "A";
+		}
+		
+		return type;
 	}
 
 	public static void getRequest(String fileName, String serverName, int serverPort) throws Exception{
