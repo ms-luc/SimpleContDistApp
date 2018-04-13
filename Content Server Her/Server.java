@@ -11,7 +11,7 @@ class Server {
 
   public static void main(String argv[]) throws Exception{
 
-  ServerSocket servsock = new ServerSocket(40200);
+  ServerSocket servsock = new ServerSocket(40301);
 
   System.out.println("\n");
 
@@ -39,7 +39,7 @@ class Server {
         outToClient.writeBytes(file.length() + "/video.mp4\n");
 
         System.out.println(message+"sent file name\n");
-		
+
 		for(int i=0;i<10000;i++){
 			for(int b=0;b<100000;b++){
 				for(int a=0;a<100000;a++){
@@ -49,7 +49,7 @@ class Server {
 				}
 			}
 		}
-		
+
 		System.out.println(message+"sending buffer\n");
 
         byte[] mybytearray = new byte[(int) file.length()];

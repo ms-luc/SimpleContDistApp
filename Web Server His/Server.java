@@ -7,14 +7,14 @@ class Server {
   static String message = "WEB SERVER: "; //his web server message
 
   public static void main(String argv[]) throws Exception{
-	  
+
 	//MulticastSocket servsock = new MulticastSocket();
 	//servsock.setBroadcast(true);
-	  
+
 	//netAddress variable = InetAddress.getByName("141.117.232.53");
 
   //ServerSocket servsock = new ServerSocket(40200, 2, variable );
-  ServerSocket servsock = new ServerSocket(40200);
+  ServerSocket servsock = new ServerSocket(40300);
 
   System.out.println("\n");
 

@@ -16,7 +16,7 @@ public class HisDNS extends DNS{
 
   //static DNS localDNS;
 
-  static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("141.117.232.48",40200), "NS");
+  static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",40202), "NS");
   //static DNSRecord herVideo = new DNSRecord("abc/Video", new InetSocketAddress("localhost",6000), "");
   //static DNSRecord[] cache = { hisCinema,  herVideo};
 
@@ -25,7 +25,7 @@ public class HisDNS extends DNS{
 
   public static void main(String argv[]) throws Exception{
 
-    DNS hisDNS = new DNS(cacheDNS, cacheServers, "His DNS: ", 40200);
+    DNS hisDNS = new DNS(cacheDNS, cacheServers, "His DNS: ", 40201);
 
     hisDNS.launchServer();
 

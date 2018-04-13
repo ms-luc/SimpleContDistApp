@@ -8,9 +8,9 @@ import static java.nio.file.StandardOpenOption.*;
 class Client {
 
 	static String message = "CLIENT: "; //client message
-		
-	DNSRecord hisCinemma = new DNSRecord("www.hiscinema.com", new InetSocketAddress("141.117.232.11",40200), "A");
-	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("141.117.232.13", 40200), "NS");
+
+	DNSRecord hisCinemma = new DNSRecord("www.hiscinema.com", new InetSocketAddress("localhost",40300), "A");
+	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("localhost", 40200), "NS");
 	DNSRecord[] cache = new DNSRecord[]{hisCinemma};
 
 	public static void main(String argv[]) throws Exception {
@@ -61,10 +61,10 @@ class Client {
 
 	//ASKS LOCAL DNS FOR DNS RECORD
 	public static DNSRecord askDNS(String url, String ip, int port) throws Exception{
-		
+
 		// string to determine type
-		String type = determineType(url); 
-		
+		String type = determineType(url);
+
 	System.out.println(message+ " request from DNS: URL - " + url + " Record Type - " + type);
 
 	  DatagramSocket clientSocket = new DatagramSocket();
@@ -78,7 +78,7 @@ class Client {
 
 		sendData = sentence.getBytes();
 
-		DatagramPacket sendPacket = 
+		DatagramPacket sendPacket =
 			new DatagramPacket(sendData, sendData.length, IPAddress, port);
 		  //new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
 
@@ -100,19 +100,19 @@ class Client {
 		return new DNSRecord().toRecord(returnedRecord);
 
 	}
-	
+
 	public static String determineType(String url){
-		
+
 		String type = "";
 		String[] splitUrl  = url.split("/");
-		
+
 		if ( splitUrl[splitUrl.length-1].equals("Video") ){
 			type = "V";
 		}
 		else{
 			type = "A";
 		}
-		
+
 		return type;
 	}
 
@@ -156,7 +156,7 @@ class Client {
 			 if(bytesRead > 0) current += bytesRead;
 //			 System.out.println(bytesRead);
 		  } while(bytesRead > 0);
-		  
+
 		  bos.write(mybytearray, 0 , current);
 		  bos.flush();
 	    bos.close();
