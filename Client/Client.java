@@ -147,7 +147,21 @@ class Client {
 	    FileOutputStream fos = new FileOutputStream(responce);
 	    BufferedOutputStream bos = new BufferedOutputStream(fos);
 	    int bytesRead = is.read(mybytearray, 0, mybytearray.length);
-	    bos.write(mybytearray, 0, bytesRead);
+	    int current = bytesRead;
+
+		System.out.println("initial " + mybytearray);
+		  do {
+			 bytesRead =
+				is.read(mybytearray, current, (mybytearray.length-current));
+			 if(bytesRead >= 0) current += bytesRead;
+			 if(bytesRead == 0)break;
+			 System.out.println(bytesRead);
+		  } while(bytesRead > -1);
+
+		  System.out.println(mybytearray);
+		  
+		  bos.write(mybytearray, 0 , current);
+		  bos.flush();
 	    bos.close();
 	    sock.close();
 
