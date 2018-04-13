@@ -1,4 +1,4 @@
-package serverhis;
+package server;
 import java.io.*;
 import java.net.*;
 
@@ -8,55 +8,55 @@ class Server {
 
   public static void main(String argv[]) throws Exception{
 
-	//MulticastSocket servsock = new MulticastSocket();
-	//servsock.setBroadcast(true);
-
-	//netAddress variable = InetAddress.getByName("141.117.232.53");
-
-  //ServerSocket servsock = new ServerSocket(40200, 2, variable );
+    //init socket
   ServerSocket servsock = new ServerSocket(40300);
 
   System.out.println("\n");
 
     while(true) {
 
-      Socket sock = servsock.accept();
+      Socket serverSocket = servsock.accept();
 
       System.out.println("\n"+message+"Connected");
 
-      //BufferedReader inFromClient =
-        //new BufferedReader(new InputStreamReader(sock.getInputStream()));
+      BufferedReader inFromClient =
+        new BufferedReader(new InputStreamReader(serverSocket.getInputStream()));
 
-      //System.out.println("looking");
-      //File file = new File(inFromServer.readLine());
-      //System.out.println("not found");
+      String getRequest = inFromClient.readLine();
+      System.out.print(message+"from client: "+ getRequest + "\n");
 
-      File file = new File("index.html");
+      // fetch file name out of GET request
+      String fileName = getRequest.split(" ")[1];
+
+      File file = new File("." + fileName);
+
+      //File file = new File("./index.html");
 
       if(file.exists()){
 
         System.out.println(message+"Sending index.html \n");
 
-        DataOutputStream outToClient = new DataOutputStream(sock.getOutputStream());
+        DataOutputStream outToClient = new DataOutputStream(serverSocket.getOutputStream());
 
-		System.out.println(message+"file length:" + file.length()+ "\n");
-        outToClient.writeBytes(file.length() + "/index.html\n");
+		    System.out.println(message+"file length:" + file.length()+ "\n");
 
-        System.out.println(message+"sent file name\n");
+        // ACK, ack number == file size
+        outToClient.writeBytes("ACK " + file.length() + "\n");
+        //outToClient.writeBytes(file.length() + "/index.html\n");
 
-        byte[] mybytearray = new byte[(int) file.length()];
-        BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-        bis.read(mybytearray, 0, mybytearray.length);
-        OutputStream os = sock.getOutputStream();
-        os.write(mybytearray, 0, mybytearray.length);
-        os.flush();
-        sock.close();
+        System.out.println(message+"sent ACK\n");
+
+        byte[] fileBufferArray = new byte[(int) file.length()];
+
+        new FileInputStream(file).read(fileBufferArray, 0, fileBufferArray.length);;
+        serverSocket.getOutputStream().write(fileBufferArray, 0, fileBufferArray.length);;
+        serverSocket.close();
 
         System.out.println(message+"Sent\n");
       }
       else{
         //ERROR 404
-        DataOutputStream outToClient = new DataOutputStream(sock.getOutputStream());
+        DataOutputStream outToClient = new DataOutputStream(serverSocket.getOutputStream());
         outToClient.writeBytes("404 NOT FOUND\n");
 
         System.out.println(message+"404 NOT FOUND\n");

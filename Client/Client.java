@@ -13,30 +13,42 @@ class Client {
 	DNSRecord localDNS = new DNSRecord("dns.local", new InetSocketAddress("localhost", 40200), "NS");
 	DNSRecord[] cache = new DNSRecord[]{hisCinemma};
 
-	public static void main(String argv[]) throws Exception {
+	public static void main(String[] args) throws Exception {
 
 		Client client = new Client();
 
-		client.connect("www.hiscinema.com");
-		System.out.println(message+ "terminating" + " www.hiscinema.com");
+		if( args.length != 0 )
+			client.connect(args[0]);
+		//client.connect("www.hiscinema.com");
+		//client.connect("www.hiscinema.com/index.html");
+		//client.connect("www.hiscinema.com/home/index1.html");
 
-		client.connect("abc/Video");
-		System.out.println(message+ "terminating" + " abc/Video");
+		//client.connect("abc/Video");
 
 	}
 
 	public void connect(String url) throws Exception{
 
+		// SPLIT URL
+		String[] urlAndPath = urlSplit(url);
+
+		url = urlAndPath[0];
+		String filePath = urlAndPath[1];
+		// SPLIT URL END
+
 		System.out.println("\n"+message+ "connecting to " + url);
 
+		// check if cached
+		// if cached fectch record and connect
 		boolean cached = false;
 		for(int i = 0; i < cache.length; i ++){
 			if(cache[i].name.equals(url)){
-				System.out.println(message+ "found url: " + url + " in cache, requesting");
+				System.out.println(message+ "found record for " + url + " in cache, sending GET Request");
 				cached = true;
 
-				//IGNORE THE INDEX.HTML
-				getRequest("index.html", cache[i].value.getHostString(), cache[i].value.getPort());
+				System.out.println(message+"requesting: " + filePath);
+				getRequest(filePath, cache[i].value.getHostString(), cache[i].value.getPort());
+				System.out.println(message+"terminating connection to: " + url);
 			}
 		}
 
@@ -116,34 +128,80 @@ class Client {
 		return type;
 	}
 
-	public static void getRequest(String url, String serverName, int serverPort) throws Exception{
+	// splits url to the domain URL and a file path(string)
+	// for example
+	// url: www.herCDN.com/media/videos/video.mp4
+	// result: www.herCDN.com and /media/videos/video.mp4 split
+	public static String[] urlSplit(String url){
 
-		System.out.println(message+ "fetching file");
+		// split url into an array with delimiter /
+		String[] temp = url.split("/");
 
-		Socket clientSocket = new Socket(serverName, serverPort);
+		// to be returned array with url and path
+		String[] urlAndPath = new String[2];
 
-		//DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
+		// set url
+		urlAndPath[0] = temp[0];
 
-		//outToServer.writeBytes(fileName + "\n");
+		//init urlAndPath[1]
+		urlAndPath[1] = "";
 
+		// set path
+		for( int i = 1; i < temp.length; i++){
+			urlAndPath[1] = urlAndPath[1] + "/" + temp[i];
+		}
+
+		if(urlAndPath[1].equals(""))
+			urlAndPath[1] = "/index.html";
+
+		// return url and path
+		return urlAndPath;
+	}
+
+	public static void getRequest(String fileName, String serverIP, int serverPort) throws Exception{
+
+		System.out.println(message+ "fetching:"+ fileName+"\n");
+
+		Socket clientSocket = new Socket(serverIP, serverPort);
+
+
+		// WRITE GET REQUEST to server
+
+		DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+		outToServer.writeBytes("GET " + fileName + "\n");
+
+		// END WRITE GET REQUEST
+
+		// GET ACK FROM SERVER
 		BufferedReader inFromServer =
 			new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-		String[] fileSizeName = inFromServer.readLine().split("/");
-		int fileSize = Integer.valueOf(fileSizeName[0]);
-		String fileName = fileSizeName[1];
+		String originalMessage = inFromServer.readLine();
+		String[] ack = originalMessage.split(" ");
+		String serverMsg = ack[0];
 
-		System.out.println(message+"getting file: " + fileName + " (size: " + fileSize + ")");
+		// if not ACKed fail
+		if(!serverMsg.equals("ACK")){
+
+			// print error message and close socket
+			System.out.println(message+" from server: " + originalMessage);
+			clientSocket.close();
+
+			// break out of getRequest();
+			return;
+		}
+		// if fail END
+
+		int messageValue = Integer.valueOf(ack[1]); // aka file size or error value
+
+		System.out.println(message+"getting file: " + fileName + " (size: " + messageValue + ")");
 
 		InputStream fileFromServer = clientSocket.getInputStream();
 
-		if(fileName.equals(message+"404 NOT FOUND")){
 
-			System.out.println(fileName);
-			clientSocket.close();
-
-		}
-		else{
+		// FILE TRANFER BEINGS
+			// rename messageValue to make it more undestandable
+			int fileSize = messageValue;
 
 			// create temp array for buffering in the file
 	    byte[] fileBufferArray = new byte[fileSize];
@@ -162,16 +220,22 @@ class Client {
 			}
 
 			// finally get the array and write it to a file
-			new FileOutputStream(fileName).write(fileBufferArray, 0 , fileSize);
+			File recieved = new File("." + fileName);
+			recieved.getParentFile().mkdirs();
+			recieved.createNewFile();
+
+			new FileOutputStream("." + fileName).write(fileBufferArray, 0 , fileSize);
 	    // you can use .close() to close the file stream
 
+		// FILE TRANSFER ENDS
+
 			System.out.println(message+"download complete");
-			System.out.println(message+"terminating connection to " + url);
 
 			// close the socket
 	    clientSocket.close();
 
-		}
+
+
 
 	}
 
