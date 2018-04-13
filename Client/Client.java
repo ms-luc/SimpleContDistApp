@@ -133,7 +133,7 @@ class Client {
 		int fileSize = Integer.valueOf(fileSizeName[0]);
 		String responce = fileSizeName[1];
 
-		System.out.println(message+"getting file: " + responce);
+		System.out.println(message+"getting file: " + responce + " (size: " + fileSize + ")");
 
 		if(responce.equals(message+"404 NOT FOUND")){
 
