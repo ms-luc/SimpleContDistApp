@@ -149,16 +149,13 @@ class Client {
 	    int bytesRead = is.read(mybytearray, 0, mybytearray.length);
 	    int current = bytesRead;
 
-		System.out.println("initial " + mybytearray);
+//		System.out.println("initial " + mybytearray);
 		  do {
 			 bytesRead =
 				is.read(mybytearray, current, (mybytearray.length-current));
-			 if(bytesRead >= 0) current += bytesRead;
-			 if(bytesRead == 0)break;
-			 System.out.println(bytesRead);
-		  } while(bytesRead > -1);
-
-		  System.out.println(mybytearray);
+			 if(bytesRead > 0) current += bytesRead;
+//			 System.out.println(bytesRead);
+		  } while(bytesRead > 0);
 		  
 		  bos.write(mybytearray, 0 , current);
 		  bos.flush();
