@@ -116,53 +116,61 @@ class Client {
 		return type;
 	}
 
-	public static void getRequest(String fileName, String serverName, int serverPort) throws Exception{
+	public static void getRequest(String url, String serverName, int serverPort) throws Exception{
 
 		System.out.println(message+ "fetching file");
 
-		Socket sock = new Socket(serverName, serverPort);
+		Socket clientSocket = new Socket(serverName, serverPort);
 
 		//DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
 
 		//outToServer.writeBytes(fileName + "\n");
 
 		BufferedReader inFromServer =
-			new BufferedReader(new InputStreamReader(sock.getInputStream()));
+			new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
 		String[] fileSizeName = inFromServer.readLine().split("/");
 		int fileSize = Integer.valueOf(fileSizeName[0]);
-		String responce = fileSizeName[1];
+		String fileName = fileSizeName[1];
 
-		System.out.println(message+"getting file: " + responce + " (size: " + fileSize + ")");
+		System.out.println(message+"getting file: " + fileName + " (size: " + fileSize + ")");
 
-		if(responce.equals(message+"404 NOT FOUND")){
+		InputStream fileFromServer = clientSocket.getInputStream();
 
-			System.out.println(responce);
-			sock.close();
+		if(fileName.equals(message+"404 NOT FOUND")){
+
+			System.out.println(fileName);
+			clientSocket.close();
 
 		}
 		else{
-	    byte[] mybytearray = new byte[fileSize];
-	    InputStream is = sock.getInputStream();
-	    FileOutputStream fos = new FileOutputStream(responce);
-	    BufferedOutputStream bos = new BufferedOutputStream(fos);
-	    int bytesRead = is.read(mybytearray, 0, mybytearray.length);
-	    int current = bytesRead;
 
-//		System.out.println("initial " + mybytearray);
-		  do {
-			 bytesRead =
-				is.read(mybytearray, current, (mybytearray.length-current));
-			 if(bytesRead > 0) current += bytesRead;
-//			 System.out.println(bytesRead);
-		  } while(bytesRead > 0);
+			// create temp array for buffering in the file
+	    byte[] fileBufferArray = new byte[fileSize];
 
-		  bos.write(mybytearray, 0 , current);
-		  bos.flush();
-	    bos.close();
-	    sock.close();
+			// create temp value to hold where the last data packet
+			// wrote to the buffer
+	    int temp = 0;
 
-			System.out.println(message+"recieved: " + responce);
+			// read from server data packet by data packet
+			for(int i = 1; i > 0;){
+
+				// write to buffer from current temp to the size of data packet
+				i = fileFromServer.read(fileBufferArray, temp, (fileBufferArray.length-temp));
+				// increment temp
+				temp += i;
+			}
+
+			// finally get the array and write it to a file
+			new FileOutputStream(fileName).write(fileBufferArray, 0 , fileSize);
+	    // you can use .close() to close the file stream
+
+			System.out.println(message+"download complete");
+			System.out.println(message+"terminating connection to " + url);
+
+			// close the socket
+	    clientSocket.close();
+
 		}
 
 	}
