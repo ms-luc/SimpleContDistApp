@@ -20,3 +20,5 @@ Usage:
 
   Run the .bat files associated wit each separate app
     located in root or their induvidual folder
+    
+  *aka. seversLaunch.bat and clientLaunch.bat
